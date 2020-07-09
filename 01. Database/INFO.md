@@ -1,4 +1,6 @@
-# Базы данных
+# 01. Database
+
+## Базы данных
 
 * Бизнес-логика (само приложение) <-> Данные
 
@@ -139,3 +141,72 @@ where id in (select id from mark where value > 90 and student_id = s.id);
 ```sql
 update mark set value = 20 where student_id = 2;
 ```
+
+* Изменение колонок (добавление внешнего ключа)
+
+```sql
+alter table mentor add foreign key(student_id) references student(id);
+alter table mentor add foreign key(subject_id) references subject(id);
+```
+
+## JOINS
+
+* INNER JOIN
+
+```sql
+select *
+from student s
+         inner join mentor m on s.id = m.student_id;
+```
+
+* LEFT JOIN
+
+```sql
+select *
+from student s
+         left join mentor m on s.id = m.student_id;
+```
+
+* RIGHT JOIN
+
+```sql
+select *
+from student s
+         right join mentor m on s.id = m.student_id;
+```
+
+* FULL OUTER JOIN
+
+```sql
+select *
+from student s
+         full outer join mentor m on s.id = m.student_id;
+```
+
+* Переименование колонок 
+
+```sql
+select s.id as s_id, m.id as m_id, *
+from student s
+         inner join mentor m on s.id = m.student_id;
+```
+
+[JOINS](https://www.w3schools.com/sql/sql_join.asp)
+
+## Базы данных в JAVA
+
+* Баз данных много, а Java одна.
+
+* Для того, чтобы Java могла работать с конкретной СУБД, эта самая СУБД предоставляет драйвер. Данный подход называется JDBC.
+
+* Java не знает, как это СУБД, код приложения не зависит от СУБД, код обращается к общим интерфейсам, а эти интерфейсы реализуются конкретным драйвером.
+
+### Классы и интерфейсы java.sql
+
+`Connection` - интерфейс, объекты которого описывают подключение к БД.
+
+`DriverManager`  - класс для работы с JDBC-драйверами.
+
+`Statement` - интерфейс, позволяющий отправлять запросы в БД.
+
+`ResultSet` - интерфейс, представляющий собой итератор по результирующей таблице.
