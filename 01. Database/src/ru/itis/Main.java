@@ -1,5 +1,9 @@
 package ru.itis;
 
+import ru.itis.jdbc.SimpleDataSource;
+import ru.itis.repositories.StudentsRepository;
+import ru.itis.repositories.StudentsRepositoryJdbcImpl;
+
 import java.sql.*;
 
 public class Main {
@@ -10,35 +14,9 @@ public class Main {
 
 
     public static void main(String[] args) throws SQLException {
-        SimpleDataSource dataSource = new SimpleDataSource();
-        // подключение к базе данных
-        Connection connection = dataSource.openConnection(URL, USER, PASSWORD);
-        // создаем выражение для отправки запросов в бд
-        Statement statement = connection.createStatement();
-        // получаем результат запроса
-        ResultSet resultSet = statement.executeQuery("select * from student");
-        // пробегаем по результирующему множеству
-        while (resultSet.next()) {
-            // выводим информацию по каждому столбцу каждой строки
-            System.out.println("ID " + resultSet.getInt("id"));
-            System.out.println("First Name " + resultSet.getString("first_name"));
-            System.out.println("Last Name " + resultSet.getString("last_name"));
-            System.out.println("Age " + resultSet.getInt("age"));
-            System.out.println("Group Number " + resultSet.getInt("group_number"));
-        }
-        System.out.println("-------------------");
-
-        resultSet.close();
-
-        resultSet = statement.executeQuery("select s.id as s_id, *\n" +
-                "from student s\n" +
-                "         full outer join mentor m on s.id = m." +
-                "student_id;");
-
-        while (resultSet.next()) {
-            System.out.println("ID " + resultSet.getInt("s_id"));
-        }
-
+        Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        StudentsRepository studentsRepository = new StudentsRepositoryJdbcImpl(connection);
+        System.out.println(studentsRepository.findById(2L));
         connection.close();
     }
 }
