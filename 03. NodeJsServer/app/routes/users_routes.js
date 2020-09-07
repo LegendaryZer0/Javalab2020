@@ -23,7 +23,7 @@ module.exports = function (app) {
         console.log(body["name"]);
         let responseBody = {
             id : Math.random(),
-            "name" : body["name"]
+            "name" : body["name"]   
         };
 
         response.setHeader("Content-Type", "application/json");
