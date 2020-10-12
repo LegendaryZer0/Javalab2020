@@ -24,9 +24,11 @@ public class UsersRepositoryJdbcImpl implements UsersRepository {
     private static final String SQL_FIND_ALL_BY_AGE = "select * from student where age = ?";
 
     private DataSource dataSource;
+    private SimpleJdbcTemplate template;
 
     public UsersRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.template = new SimpleJdbcTemplate(dataSource);
     }
 
     private RowMapper<User> userRowMapper = row -> User.builder()

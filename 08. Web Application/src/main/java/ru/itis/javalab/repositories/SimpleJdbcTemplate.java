@@ -1,5 +1,6 @@
 package ru.itis.javalab.repositories;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 /**
@@ -10,6 +11,12 @@ import java.util.List;
  * @version v1.0
  */
 public class SimpleJdbcTemplate {
+    private DataSource dataSource;
+
+    public SimpleJdbcTemplate(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     public <T> List<T> query(String sql, RowMapper<T> rowMapper, Object ... args) {
         return null;
     }
