@@ -2,6 +2,7 @@ package ru.itis.javalab.servlets;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.itis.javalab.models.User;
 import ru.itis.javalab.repositories.UsersRepository;
 import ru.itis.javalab.repositories.UsersRepositoryJdbcImpl;
@@ -12,10 +13,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,16 +31,30 @@ import java.util.List;
 public class UsersServlet extends HttpServlet {
 
     private UsersService usersService;
+    private PasswordEncoder passwordEncoder;
+
+
 
     @Override
     public void init(ServletConfig config) throws ServletException {
+        super.init(config);
         ServletContext servletContext = config.getServletContext();
         this.usersService = (UsersService) servletContext.getAttribute("usersService");
+        this.passwordEncoder = (PasswordEncoder) servletContext.getAttribute("passwordEncoder");
     }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        PrintWriter writer = response.getWriter();
+        if (request.getSession(false) != null) {
+            System.out.println(request.getSession(false).getAttribute("Hello"));
+        } else {
+            HttpSession session = request.getSession();
+            session.setAttribute("Hello", "Hello from server!");
+        }
+        // false - если сессии не было, то вернет null
+        // если true, то он создаст сессию и вернет ее
+        // если ничего не указано, то либо вернет существующую, либо создаст новую
+        //        PrintWriter writer = response.getWriter();
 //        writer.println("<h1>Users page!</h1>");
         List<User> users = new ArrayList<>();
         users.add(User.builder()
@@ -63,6 +75,10 @@ public class UsersServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String password = request.getParameter("password");
+        String hashPassword = passwordEncoder.encode(password);
+        System.out.println(hashPassword);
+        System.out.println(passwordEncoder.matches("qwerty007", hashPassword));
         String color = request.getParameter("color");
         Cookie cookie = new Cookie("color", color);
         cookie.setMaxAge(60 * 60 * 24 * 365);

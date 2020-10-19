@@ -2,6 +2,8 @@ package ru.itis.javalab.listeners;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.itis.javalab.repositories.UsersRepository;
 import ru.itis.javalab.repositories.UsersRepositoryJdbcImpl;
 import ru.itis.javalab.services.UsersService;
@@ -10,6 +12,7 @@ import ru.itis.javalab.services.UsersServiceImpl;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -21,9 +24,8 @@ import java.util.Properties;
  * @author Sidikov Marsel (First Software Engineering Platform)
  * @version v1.0
  */
+@WebListener
 public class CustomServletContextListener implements ServletContextListener {
-
-
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -31,7 +33,7 @@ public class CustomServletContextListener implements ServletContextListener {
 
         Properties properties = new Properties();
         try {
-            properties.load(new FileReader("db.properties"));
+            properties.load(servletContext.getResourceAsStream("/WEB-INF/db.properties"));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -47,8 +49,10 @@ public class CustomServletContextListener implements ServletContextListener {
 
         UsersRepository usersRepository = new UsersRepositoryJdbcImpl(dataSource);
         UsersService usersService = new UsersServiceImpl(usersRepository);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         servletContext.setAttribute("usersService", usersService);
+        servletContext.setAttribute("passwordEncoder", passwordEncoder);
     }
 
     @Override
