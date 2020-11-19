@@ -25,7 +25,7 @@ public class UsersController implements Controller {
         if (httpServletRequest.getMethod().equals("GET")) {
             ModelAndView modelAndView = new ModelAndView();
             modelAndView.addObject("users", usersService.getAllUsers());
-            modelAndView.setViewName("users");
+            modelAndView.setViewName("users_view");
             return modelAndView;
         }
         return null;
