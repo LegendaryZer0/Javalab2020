@@ -22,27 +22,60 @@ import java.util.Set;
  * @version v1.0
  */
 @AutoService(Processor.class)
-@SupportedAnnotationTypes(value = {"HtmlForm"})
+@SupportedAnnotationTypes(value = {"HtmlForm","HtmlInput"})
 public class HtmlProcessor extends AbstractProcessor {
+    String path;
+    Path out;
+    BufferedWriter writer;
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         // получить типы с аннотаций HtmlForm
         Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(HtmlForm.class);
+
         for (Element element : annotatedElements) {
             // получаем полный путь для генерации html
             String path = HtmlProcessor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             // User.class -> User.html
-            path = path.substring(1) + element.getSimpleName().toString() + ".html";
-            Path out = Paths.get(path);
+            path = path.substring(1) + element.getSimpleName().toString() + ".ftlh";
+            out = Paths.get(path);
             try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(out.toFile()));
+                writer = new BufferedWriter(new FileWriter(out.toFile()));
                 HtmlForm annotation = element.getAnnotation(HtmlForm.class);
                 writer.write("<form action='" + annotation.action() + "' method='" + annotation.method() + "'/>");
-                writer.close();
+                writer.newLine();
+               /* writer.close();*/
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
 
+        }
+        annotatedElements = roundEnv.getElementsAnnotatedWith(HtmlInput.class);
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, annotatedElements.toString());
+
+
+        annotatedElements.forEach(element -> {
+
+          /*  String path = HtmlProcessor.class.getProtectionDomain().getCodeSource().getLocation().getPath();*/
+            // User.class -> User.html
+           /* path = path.substring(1) + element.getSimpleName().toString() + ".ftlh";*/
+            /*Path out = Paths.get(path);*/
+
+            try {
+               /* BufferedWriter writer = new BufferedWriter(new FileWriter(out.toFile()));*/
+                HtmlInput annotation = element.getAnnotation(HtmlInput.class);
+                writer.write("<input type='" + annotation.type() + "' name='" + annotation.name() + "' placeholder='" + annotation.placeholder() + "'/>");
+                writer.newLine();
+
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        });
+
+        try {
+            writer.write("</form>");
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return true;
     }
