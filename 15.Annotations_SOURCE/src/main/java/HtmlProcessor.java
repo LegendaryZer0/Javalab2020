@@ -28,11 +28,13 @@ public class HtmlProcessor extends AbstractProcessor {
     Path out;
     BufferedWriter writer;
     @Override
+
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         // получить типы с аннотаций HtmlForm
         Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(HtmlForm.class);
 
         for (Element element : annotatedElements) {
+
             // получаем полный путь для генерации html
             String path = HtmlProcessor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             // User.class -> User.html
@@ -41,27 +43,43 @@ public class HtmlProcessor extends AbstractProcessor {
             try {
                 writer = new BufferedWriter(new FileWriter(out.toFile()));
                 HtmlForm annotation = element.getAnnotation(HtmlForm.class);
+
                 writer.write("<form action='" + annotation.action() + "' method='" + annotation.method() + "'/>");
                 writer.newLine();
-               /* writer.close();*/
+                element.getEnclosedElements().stream().forEach(x->{
+                    HtmlInput innerAnnotation = x.getAnnotation(HtmlInput.class);
+                    if (innerAnnotation!=null) {
+                        try {
+                            writer.write("<input type='" + innerAnnotation.type() + "' name='" + innerAnnotation.name() + "' placeholder='" + innerAnnotation.placeholder() + "'/>");
+                            writer.newLine();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                writer.write("</form>");
+                writer.flush();
+                writer.close();
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
 
+
+
         }
-        annotatedElements = roundEnv.getElementsAnnotatedWith(HtmlInput.class);
+        /*annotatedElements = roundEnv.getElementsAnnotatedWith(HtmlInput.class);
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, annotatedElements.toString());
 
 
         annotatedElements.forEach(element -> {
 
-          /*  String path = HtmlProcessor.class.getProtectionDomain().getCodeSource().getLocation().getPath();*/
+          *//*  String path = HtmlProcessor.class.getProtectionDomain().getCodeSource().getLocation().getPath();*//*
             // User.class -> User.html
-           /* path = path.substring(1) + element.getSimpleName().toString() + ".ftlh";*/
-            /*Path out = Paths.get(path);*/
+           *//* path = path.substring(1) + element.getSimpleName().toString() + ".ftlh";*//*
+            *//*Path out = Paths.get(path);*//*
 
             try {
-               /* BufferedWriter writer = new BufferedWriter(new FileWriter(out.toFile()));*/
+               *//* BufferedWriter writer = new BufferedWriter(new FileWriter(out.toFile()));*//*
                 HtmlInput annotation = element.getAnnotation(HtmlInput.class);
                 writer.write("<input type='" + annotation.type() + "' name='" + annotation.name() + "' placeholder='" + annotation.placeholder() + "'/>");
                 writer.newLine();
@@ -69,14 +87,15 @@ public class HtmlProcessor extends AbstractProcessor {
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
-        });
+        });*/
 
-        try {
+       /* try {
             writer.write("</form>");
+            writer.flush();
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         return true;
     }
 }
