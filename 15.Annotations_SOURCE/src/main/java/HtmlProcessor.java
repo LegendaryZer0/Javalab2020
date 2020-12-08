@@ -1,4 +1,5 @@
 import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Processor;
@@ -23,18 +24,18 @@ import java.util.Set;
  */
 @AutoService(Processor.class)
 @SupportedAnnotationTypes(value = {"HtmlForm","HtmlInput"})
+@Slf4j
 public class HtmlProcessor extends AbstractProcessor {
     String path;
     Path out;
     BufferedWriter writer;
     @Override
-
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         // получить типы с аннотаций HtmlForm
         Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(HtmlForm.class);
 
         for (Element element : annotatedElements) {
-
+            log.info("Сообщение из SLF4J");
             // получаем полный путь для генерации html
             String path = HtmlProcessor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             // User.class -> User.html
@@ -51,8 +52,13 @@ public class HtmlProcessor extends AbstractProcessor {
                     if (innerAnnotation!=null) {
                         try {
                             writer.write("<input type='" + innerAnnotation.type() + "' name='" + innerAnnotation.name() + "' placeholder='" + innerAnnotation.placeholder() + "'/>");
+                            log.info("InnerAnnotation type {}",innerAnnotation.type());
+                            log.info("InnerAnnotation plaeceholder {}",innerAnnotation.placeholder());
                             writer.newLine();
                         } catch (IOException e) {
+
+                            log.error("Ошибка {}",new IllegalStateException(e).toString());
+
                             e.printStackTrace();
                         }
                     }
@@ -61,6 +67,9 @@ public class HtmlProcessor extends AbstractProcessor {
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
+
+                log.error("Ошибка {}",new IllegalStateException(e).toString());
+
                 throw new IllegalStateException(e);
             }
 
