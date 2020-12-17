@@ -11,18 +11,18 @@ import ru.itdrive.web.models.User;
 @Component(value = "usersRepositoryJdbcImpl")
 public class UsersRepositoryJdbcImpl implements UsersRepository {
 
-    //language=SQL
+    //language=PostgreSQL
     private static final String SQL_INSERT_USER = "insert into simple_user(email, password, confirm_code) " +
             "values (?, ?, ?)";
 
-    //language=SQL
+    //language=PostgreSQL
     private static final String SQL_UPDATE_USER = "update simple_user set email = ?, password = ?, confirm_code = ?, is_deleted = ? " +
             "where id = ?";
 
-    //language=SQL
+    //language=PostgreSQL
     private static final String SQL_FIND_USER_BY_ID = "select * from simple_user where id = ?";
 
-    //language=SQL
+    //language=PostgreSQL
     private static final String SQL_FIND_USER_BY_EMAIL = "select * from simple_user where email = ?";
 
     private DataSource dataSource;

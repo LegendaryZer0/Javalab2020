@@ -1,5 +1,7 @@
 package ru.itdrive.web.filters;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +10,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static ru.itdrive.web.filters.ResponseUtil.sendForbidden;
-
+@Slf4j
 public class SecurityFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -20,6 +22,7 @@ public class SecurityFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest)servletRequest;
         HttpServletResponse response = (HttpServletResponse)servletResponse;
         System.out.println("In SecurityFilter " + request.getRequestURI() + "?" + request.getQueryString());
+        log.info("In SecurityFilter " + request.getRequestURI() + "?" + request.getQueryString());
         if (!isProtected(request.getRequestURI())) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
